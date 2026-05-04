@@ -1,0 +1,32 @@
+name: CI/CD Smart Predictor
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Test API format
+      run: |
+        python -c "
+        import pickle, numpy as np
+        with open('model.pkl', 'rb') as f:
+            model = pickle.load(f)
+        pred = model.predict([[0.5, 0.7, 3, 180, 3, 0, 0, 2]])
+        assert pred[0] in [0, 1], 'Erreur : prédiction invalide'
+        print('Test réussi :', pred[0])
+        "
