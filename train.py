@@ -2,7 +2,8 @@ import pandas as pd
 import mlflow
 import mlflow.sklearn
 import pickle
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, f1_score
 
@@ -23,7 +24,7 @@ X_train.to_csv("reference_data.csv", index=False)
 mlflow.set_experiment("churn_prediction")
 
 with mlflow.start_run():
-    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    model = LogisticRegression(max_iter=1000, C=1.0, random_state=42)
     model.fit(X_train, y_train)
     
     y_pred = model.predict(X_test)
@@ -31,7 +32,8 @@ with mlflow.start_run():
     f1 = f1_score(y_test, y_pred)
     
     # Log paramètres et métriques
-    mlflow.log_param("n_estimators", 100)
+    mlflow.log_param("max_iter", 1000)
+    mlflow.log_param("C", 1.0)
     mlflow.log_metric("accuracy", acc)
     mlflow.log_metric("f1_score", f1)
     mlflow.sklearn.log_model(model, "churn_model")
